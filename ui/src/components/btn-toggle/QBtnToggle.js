@@ -19,6 +19,8 @@ export default Vue.extend({
       required: true
     },
 
+    multiple: Boolean,
+
     options: {
       type: Array,
       required: true,
@@ -62,7 +64,9 @@ export default Vue.extend({
 
   computed: {
     hasActiveValue () {
-      return this.options.find(opt => opt.value === this.value) !== void 0
+      return this.multiple
+        ? this.options.findIndex(opt => this.value.indexOf(opt.value) > -1) > -1
+        : this.options.find(opt => opt.value === this.value) !== void 0
     },
 
     formAttrs () {
@@ -106,7 +110,7 @@ export default Vue.extend({
             disable: this.disable === true || opt.disable === true,
 
             // Options that come from the button specific options first, then from general props
-            color: opt.value === this.value ? mergeOption(opt, 'toggleColor') : mergeOption(opt, 'color'),
+            color: opt.value === this.value || (this.multiple && this.value.indexOf(opt.value) > -1) ? mergeOption(opt, 'toggleColor') : mergeOption(opt, 'color'),
             textColor: opt.value === this.value ? mergeOption(opt, 'toggleTextColor') : mergeOption(opt, 'textColor'),
             noCaps: mergeOption(opt, 'noCaps') === true,
             noWrap: mergeOption(opt, 'noWrap') === true,
@@ -125,14 +129,32 @@ export default Vue.extend({
   methods: {
     __set (value, opt, e) {
       if (this.readonly !== true) {
-        if (this.value === value) {
-          if (this.clearable === true) {
-            this.$emit('input', null, null)
-            this.$emit('clear')
+        if (this.multiple) {
+          const valueIndex = this.value.indexOf(value)
+          const emittedArray = this.value || []
+          if (valueIndex > -1) {
+            if (
+              emittedArray.length > 1 ||
+              (emittedArray.length === 1 && this.clearable === true)
+            ) {
+              emittedArray.splice(valueIndex, 1)
+            }
           }
+          else {
+            emittedArray.push(value)
+          }
+          this.$emit('input', emittedArray)
         }
         else {
-          this.$emit('input', value, opt)
+          if (this.value === value) {
+            if (this.clearable === true) {
+              this.$emit('input', null, null)
+              this.$emit('clear')
+            }
+          }
+          else {
+            this.$emit('input', value, opt)
+          }
         }
 
         this.$emit('click', e)

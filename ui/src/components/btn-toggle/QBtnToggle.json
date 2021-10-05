@@ -17,6 +17,12 @@
       "category": "model"
     },
 
+    "multiple": {
+      "type": "Boolean",
+      "desc": "Allow multiple selection; Model must be Array",
+      "category": "model"
+    },
+
     "options": {
       "type": "Array",
       "desc": "Array of Objects defining each option",

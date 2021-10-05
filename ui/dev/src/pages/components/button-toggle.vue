@@ -114,6 +114,13 @@
       rounded
       :options="optionsD"
     />
+
+    <q-btn-toggle
+      v-model="modelM"
+      multiple
+      :options="optionsM"
+      toggle-color="primary"
+    />
   </div>
 </template>
 
@@ -123,6 +130,7 @@ export default {
     return {
       model: '',
       modelD: '',
+      modelM: [],
       options: [true, false],
       optionsO1: [
         { label: 'One', value: 'one' },
@@ -153,6 +161,7 @@ export default {
         { label: 'Two', value: 'two', count: 0 },
         { label: 'Three', value: 'three', count: 0 }
       ],
+      optionsM: Array.from({ length: 10 }, (_, i) => ({ label: i + 1, value: i + 1 })),
       sizes: ['sm', 'md', 'lg']
     }
   },
